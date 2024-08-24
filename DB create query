@@ -1,0 +1,17 @@
+CREATE TABLE users(
+	id SERIAL PRIMARY KEY,
+	username VARCHAR,
+	password VARCHAR
+);
+CREATE TABLE users_auth(
+	id_users INT REFERENCES users(id),
+	is_success BOOLEAN,
+	timestamp TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE messages(
+	id SERIAL PRIMARY KEY,
+	sender VARCHAR,
+	receiver VARCHAR, 
+	content VARCHAR
+);

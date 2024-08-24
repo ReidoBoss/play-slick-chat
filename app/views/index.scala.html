@@ -1,0 +1,49 @@
+@()(implicit flash: Flash)
+
+@main("Welcome to Play") {
+    <h1>@flash.get("message").getOrElse("Welcome to My Chat App!")</h1>
+    <h2>ENTER YOUR CREDENTIALS</h2>
+    <h3>USERNAME</h3>
+      <input type="text" id="username">
+    <h3>PASSWORD</h3>
+      <input type="password" id="password">
+
+    <input type="text" readonly style="border:none;" id="error">
+    <br>
+    <button OnClick="logIn()">LOG-IN</button>
+    <button OnClick="register()">REGISTER</button>
+  <script>
+    const username = document.getElementById("username");
+    const password = document.getElementById("password");
+    const error = document.getElementById("error");
+
+    password.onkeydown = (event) => {
+      if(event.key === 'Enter'){
+        logIn()
+      }
+    }
+
+    function logIn(){
+      var req = new XMLHttpRequest();
+
+      req.responseType = 'json';
+
+      req.open('POST', "/users/auth", true);
+      req.setRequestHeader("Content-Type","application/json")
+      req.send(JSON.stringify({"username":username.value,"password":password.value}))
+      req.onload  = function() {
+         var res = req.response;
+         if(res.Message === 'Success!'){
+          window.location.href="/landing"
+         }
+         else{
+          error.value = "Wrong!"
+         }
+      };
+    }
+    function register(){
+      window.location.href = "/register"
+    }
+
+  </script>
+}

@@ -1,0 +1,29 @@
+@import models.user._
+@(users: List[Users],current:String)
+
+@main("Landing Page"){
+
+	<h1>Welcome! @current</h1>
+	<h2>Available Users:</h2>
+	<ul>
+		@for(user <- users){
+			<li><button OnClick="redirect(`@user.username`)">@user.username</button></li>
+		}
+	</ul>
+
+	<button OnClick="logOut()">Log Out</button>
+
+<script>
+	function redirect(location) {
+		window.location.href = "/messages/"+location
+	}
+	function logOut(){
+		const xhr = new XMLHttpRequest
+		xhr.open("POST","/users/logout",true)
+		xhr.setRequestHeader("Content-Type","application/json")
+		xhr.send()
+		window.location.reload()
+	}
+
+</script>
+}	

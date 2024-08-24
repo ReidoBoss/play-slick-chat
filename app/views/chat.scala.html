@@ -1,0 +1,59 @@
+@import models.messages.Messages
+@(sender:String,receiver:String,messages:Seq[Messages])(implicit request: RequestHeader,flash:Flash)
+
+@main("Chat"){
+	<a href="/landing">Back</a>
+	
+	<h1> @receiver </h1> 
+	<input type="hidden" value="@receiver" id="receiver">
+	<input type="text" id="sender" value="@sender" readonly style="border: none;"><br>
+    
+    <input type="hidden" id="ws-route" value="@routes.MessageController.socket.absoluteURL()">
+
+    <input type="text" id="chat-input" size="80" placeholder="Enter your chat here..."><br>
+	@for(msg <- messages) {
+		@if(msg.sender == sender) {
+		<p>	Me: @msg.content</p> 
+		}else{
+			<p>@receiver: @msg.content</p>
+		}
+	}
+    <textarea id="chat-area" rows="40" cols="80" readonly style="border: none;">
+
+	</textarea><br>
+
+<script>
+	const sender = document.getElementById("sender")
+	const receiver = document.getElementById("receiver")
+	const inputField = document.getElementById("chat-input");
+	const outputField = document.getElementById("chat-area");
+	const socketRoute = document.getElementById("ws-route").value;
+	const socket = new WebSocket(socketRoute.replace("http","ws"));
+
+
+	inputField.onkeydown = (event) =>{
+		if(event.key==='Enter'){
+			socket.send(sender.value+': '+inputField.value);
+			sendMessage()
+			inputField.value = ''	
+		}
+
+	}
+
+
+	socket.onmessage = (event) => {
+		outputField.value += '\n' + event.data
+	}
+
+	function sendMessage(){
+		const xhr = new XMLHttpRequest
+		xhr.open("POST",`/send-chat/${receiver.value}`,true)
+		xhr.setRequestHeader("Content-Type","application/json");
+		const data = JSON.stringify({"content":inputField.value})
+		xhr.send(data)
+	}
+
+
+
+</script>
+}
